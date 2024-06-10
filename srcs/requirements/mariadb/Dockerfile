@@ -1,25 +1,21 @@
 FROM debian:bullseye
 
-# update
-RUN apt update -y
-RUN apt upgrade -y
-# RUN apt autoremove --yes
-# RUN apt clean autoclean
+ARG SQL_DATABASE
+ARG SQL_USER
+ARG SQL_PASSWORD
+ARG SQL_ROOT_PASSWORD
 
-# mariadb
-RUN apt install -y mariadb-server
+RUN apt update && apt upgrade -y
+RUN apt install mariadb-server -y
 
-COPY conf/mariadb.conf /etc/mysql/mariadb.conf.d/50-server.cnf
+COPY ./config/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
 
-# ARG SQL_DATABASE
-# ARG SQL_USER
-# ARG SQL_PASSWORD
-# ARG SQL_ROOT_PASSWORD
+RUN service mariadb start && \
+    mysql -e "CREATE DATABASE IF NOT EXISTS $SQL_DATABASE; \
+    CREATE USER IF NOT EXISTS $SQL_USER @'localhost' IDENTIFIED BY '$SQL_PASSWORD'; \
+    GRANT ALL PRIVILEGES ON $SQL_DATABASE.* TO $SQL_USER@'%' IDENTIFIED BY '$SQL_PASSWORD'; \
+    ALTER USER 'root'@'localhost' IDENTIFIED BY '$SQL_ROOT_PASSWORD'; \
+    FLUSH PRIVILEGES;" &&  \
+    mysqladmin -u root -p$SQL_ROOT_PASSWORD shutdown
 
-COPY /configdatabase.sh /var/configdatabase.sh
-
-RUN chmod +x /var/configdatabase.sh
-
-EXPOSE 3306
-
-CMD ["/bin/bash", "/var/configdatabase.sh"]
+CMD ["mysqld_safe"]

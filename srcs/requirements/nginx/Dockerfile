@@ -1,18 +1,16 @@
 FROM debian:bullseye
 
-RUN apt-get -y update \
-    && apt-get -y install nginx \
-    && apt-get -y install openssl
+RUN apt update && apt upgrade -y
+RUN apt install nginx openssl -y
+
+COPY ./config/nginx.conf /etc/nginx/nginx.conf
 
 RUN mkdir -p /etc/nginx/ssl
 
-RUN mkdir -p /run/nginx
-
-RUN openssl req -x509 -nodes -out /etc/nginx/ssl/inception.crt \ 
-    -keyout /etc/nginx/ssl/inception.key -subj "/C=FR/ST=IDF/L=Paris/O=42/OU=42/CN=gclement.42.fr/UID=login"
-
-COPY /conf/nginx.conf /etc/nginx/nginx.conf
-
-EXPOSE 443/tcp
+# -x509: certificate type
+# -nodes: disable password
+# -out: certificate file
+# -keyout: key certificate file
+RUN openssl req -x509 -nodes -out /etc/nginx/ssl/certificate.crt -keyout /etc/nginx/ssl/certificate.key -subj "/C=FR/ST=IDF/L=Paris/O=42/OU=42/CN=hferraud.42.fr/UID=hferraud"
 
 CMD ["nginx"]
