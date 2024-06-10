@@ -8,3 +8,4 @@ mysql -u root -p$SQL_ROOT_PASSWORD -e "FLUSH PRIVILEGES;"
 
 #shutdown mysql
 mysqladmin -u root -p$SQL_ROOT_PASSWORD shutdown
+exec mysqld_safe #Restart MySQL

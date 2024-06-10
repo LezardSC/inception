@@ -8,7 +8,7 @@ DIR_SRC				=	srcs/
 
 VOL_PATH			=	/home/jrenault/data/
 
-VOLUMES				=	$(WORDPRESS_VOLUME_PATH) $(MARIADB_VOLUME_PATH)
+VOLUMES				=	$(WP_VOLUME) $(MARIADB_VOLUME)
 
 include $(DIR_SRC).env
 
